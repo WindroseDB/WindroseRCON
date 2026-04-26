@@ -83,3 +83,11 @@ python test_rcon.py
 ### Credits
 - [Dumper7](https://github.com/Encryqed/Dumper-7) - For SDK generation
 - [GameHostBros](https://www.gamehostbros.com/) - Providing server for testing on Wine.
+
+## Contributing
+
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to contribute to this project.
+
+## License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
