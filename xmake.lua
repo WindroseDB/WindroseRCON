@@ -17,7 +17,8 @@ target("version")
               "src/commands/ban.cpp",
               "src/commands/unban.cpp",
               "src/commands/banlist.cpp",
-              "src/commands/getpos.cpp")
+              "src/commands/getpos.cpp",
+              "src/commands/shutdown.cpp")
     add_headerfiles("src/windrose_engine.h",
                     "src/config/config.h",
                     "src/rcon/rcon_server.h",

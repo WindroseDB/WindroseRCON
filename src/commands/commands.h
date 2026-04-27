@@ -12,4 +12,5 @@ namespace Commands {
     std::string ExecuteUnban(const std::string& args);
     std::string ExecuteBanlist();
     std::string ExecuteGetPos(const std::string& args);
+    std::string Shutdown(const std::string& args);
 }

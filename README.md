@@ -50,9 +50,10 @@ python test_rcon.py
 - `showplayers` - List all online players
 - `help` - Show available commands
 - `kick <AccountId>` - Kicks player by their account ID
-- `ban <AccountId>` - Bans player by their account ID
+- `ban <AccountId> [reason]` - Bans player by their account ID (optional reason)
 - `unban <AccountId>` - Unbans player by their account ID
 - `banlist` - Shows all banned players
+- `shutdown [seconds]` - Shutdown server (default 10s, max 300s)
 - `getpos <AccountId>` - Gets player world position by their account ID
 
 ## Building

@@ -403,6 +403,10 @@ namespace UnrealEngine {
         else if (cmd == "banlist") {
             return Commands::ExecuteBanlist();
         }
+        else if (cmd == "shutdown" || cmd.substr(0, 9) == "shutdown ") {
+            std::string args = cmd.size() > 9 ? command.substr(9) : "";
+            return Commands::Shutdown(args);
+        }
         else {
             std::stringstream response;
             response << "Unknown command: " << command << "\n";

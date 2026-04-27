@@ -11,6 +11,7 @@ namespace Commands {
         response << "  unban <account_id> - Remove a player from the ban list\n";
         response << "  banlist - Show all banned players\n";
         response << "  getpos <account_id> - Show a player's world position\n";
+        response << "  shutdown [seconds] - Shutdown server (default 10s, max 300s)\n";
         response << "  help - Show this help message\n";
         return response.str();
     }
