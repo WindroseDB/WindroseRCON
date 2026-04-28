@@ -9,6 +9,7 @@ Standalone RCON server for Windrose game servers using source rcon protocol. Inj
 - **Configuration** - Settings stored in `windrosercon/settings.ini`
 - **Logging** - All activity logged to `windrosercon/rcon.log`
 - **Player Management** - Manage players by their account IDs.
+- **Shutdown Command** - Shutdown server with optional delay.
 
 ## Installation
 
@@ -54,7 +55,9 @@ python test_rcon.py
 - `unban <AccountId>` - Unbans player by their account ID
 - `banlist` - Shows all banned players
 - `shutdown [seconds]` - Shutdown server (default 10s, max 300s)
+- `playerinfo <AccountID>` - Gets player information by their account ID
 - `getpos <AccountId>` - Gets player world position by their account ID
+- `uptime` - Gets server uptime
 
 ## Building
 
@@ -63,7 +66,7 @@ python test_rcon.py
 - Visual Studio 2022
 - Windows SDK
 
-## Build Project
+### Build Project
 1. Build the project with xmake:
    ```bash
    xmake
@@ -81,10 +84,6 @@ python test_rcon.py
    - `0x02B2` - PlayerFlags (filters inactives)
 4. **RCON Protocol**: Implements Source RCON protocol for authentication and commands.
 
-### Credits
-- [Dumper7](https://github.com/Encryqed/Dumper-7) - For SDK generation
-- [GameHostBros](https://www.gamehostbros.com/) - Providing server for testing on Wine.
-
 ## Contributing
 
 Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to contribute to this project.
@@ -92,3 +91,7 @@ Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for gu
 ## License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+
+## Credits
+- [Dumper7](https://github.com/Encryqed/Dumper-7) - For SDK generation
+- [GameHostBros](https://www.gamehostbros.com/) - Providing server for testing on Wine.

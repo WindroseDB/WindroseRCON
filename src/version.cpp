@@ -16,6 +16,8 @@ RCONConfig g_Config;
 std::thread* g_InitThread = nullptr;
 std::thread* g_BanEnforceThread = nullptr;
 volatile bool g_BanEnforceRunning = false;
+std::chrono::steady_clock::time_point g_ServerStartTime = std::chrono::steady_clock::now();
+std::chrono::system_clock::time_point g_ServerStartSystemTime = std::chrono::system_clock::now();
 
 void LogMessage(const std::string& message);
 

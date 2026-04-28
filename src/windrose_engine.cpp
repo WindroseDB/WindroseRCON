@@ -407,6 +407,13 @@ namespace UnrealEngine {
             std::string args = cmd.size() > 9 ? command.substr(9) : "";
             return Commands::Shutdown(args);
         }
+        else if (cmd == "uptime") {
+            return Commands::ExecuteUptime();
+        }
+        else if (cmd == "playerinfo" || cmd.substr(0, 11) == "playerinfo ") {
+            std::string args = cmd.size() > 11 ? command.substr(11) : "";
+            return Commands::ExecutePlayerInfo(args);
+        }
         else {
             std::stringstream response;
             response << "Unknown command: " << command << "\n";
