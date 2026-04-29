@@ -9,6 +9,10 @@ struct RCONConfig {
     std::string password = "windrose_admin";
     bool enableLogging = true;
     std::string logFile = "windrosercon\\rcon.log";
+    std::string bindAddress = "0.0.0.0";
+    std::string allowedIPs = "";
+    int maxFailedAttempts = 5;
+    int timeout = 60;
     
     void Load(const std::string& configPath) {
         std::ifstream file(configPath);
@@ -39,6 +43,14 @@ struct RCONConfig {
                 enableLogging = (value == "true" || value == "1");
             } else if (key == "LogFile") {
                 logFile = value;
+            } else if (key == "BindAddress") {
+                bindAddress = value;
+            } else if (key == "AllowedIPs") {
+                allowedIPs = value;
+            } else if (key == "MaxFailedAttempts") {
+                maxFailedAttempts = std::stoi(value);
+            } else if (key == "Timeout") {
+                timeout = std::stoi(value);
             }
         }
         file.close();
@@ -51,8 +63,16 @@ struct RCONConfig {
         file << "# Windrose RCON Configuration\n";
         file << "# Generated automatically - edit as needed\n\n";
         file << "[RCON]\n";
+        file << "# Bind to 127.0.0.1 to restrict to localhost only (recommended)\n";
+        file << "BindAddress=" << bindAddress << "\n";
         file << "Port=" << port << "\n";
         file << "Password=" << password << "\n";
+        file << "# Comma separated IP whitelist. Empty = allow all\n";
+        file << "AllowedIPs=" << allowedIPs << "\n";
+        file << "# Max failed auth attempts before IP is blocked\n";
+        file << "MaxFailedAttempts=" << maxFailedAttempts << "\n";
+        file << "# Idle/auth timeout in seconds\n";
+        file << "Timeout=" << timeout << "\n";
         file << "EnableLogging=" << (enableLogging ? "true" : "false") << "\n";
         file << "LogFile=" << logFile << "\n";
         

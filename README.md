@@ -2,6 +2,15 @@
 
 Standalone RCON server for Windrose game servers using source rcon protocol. Injects via `version.dll` proxy and provides server information, query and player management.
 
+> [!WARNING]
+> This uses the **Source RCON protocol**, which transmits passwords and commands in **plain text** over TCP. Anyone able to sniff network traffic between your client and the server can read your RCON password and any commands you send.
+>
+> **Recommendations:**
+> - Bind RCON to `127.0.0.1` (localhost) and use an SSH tunnel for remote access
+> - Run RCON only over a trusted network.
+> - Never expose the RCON port directly to the public internet.
+> - Use a strong, unique password
+
 ## Features
 
 - **Server Information** - View server details, player count, invite code
