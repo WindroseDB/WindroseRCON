@@ -3,6 +3,9 @@
 #include <fstream>
 #include <sstream>
 #include <windows.h>
+#include <wincrypt.h>
+
+#pragma comment(lib, "advapi32.lib")
 
 struct RCONConfig {
     int port = 27065;
@@ -13,6 +16,8 @@ struct RCONConfig {
     std::string allowedIPs = "";
     int maxFailedAttempts = 5;
     int timeout = 60;
+    bool secureRconEnabled = false;
+    std::string aesKey = "";
     
     void Load(const std::string& configPath) {
         std::ifstream file(configPath);
@@ -51,12 +56,20 @@ struct RCONConfig {
                 maxFailedAttempts = std::stoi(value);
             } else if (key == "Timeout") {
                 timeout = std::stoi(value);
+            } else if (key == "Enabled") {
+                secureRconEnabled = (value == "true" || value == "1");
+            } else if (key == "AESKey") {
+                aesKey = value;
             }
         }
         file.close();
     }
     
     void Save(const std::string& configPath) {
+        if (aesKey.empty()) {
+            aesKey = GenerateAESKey();
+        }
+        
         std::ofstream file(configPath);
         if (!file.is_open()) return;
         
@@ -74,7 +87,13 @@ struct RCONConfig {
         file << "# Idle/auth timeout in seconds\n";
         file << "Timeout=" << timeout << "\n";
         file << "EnableLogging=" << (enableLogging ? "true" : "false") << "\n";
-        file << "LogFile=" << logFile << "\n";
+        file << "LogFile=" << logFile << "\n\n";
+        
+        file << "[SecureRCON]\n";
+        file << "# Enable AES-256-GCM encryption. Needs custom client!\n";
+        file << "Enabled=" << (secureRconEnabled ? "true" : "false") << "\n";
+        file << "# Auto-generated 256-bit encryption key. Keep this secret!\n";
+        file << "AESKey=" << aesKey << "\n";
         
         file.close();
     }
@@ -100,6 +119,31 @@ struct RCONConfig {
         }
         std::string configDir = path + "\\windrosercon";
         CreateDirectoryA(configDir.c_str(), NULL);
+    }
+    
+    static std::string GenerateAESKey() {
+        HCRYPTPROV hProv = 0;
+        if (!CryptAcquireContextA(&hProv, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT)) {
+            return "";
+        }
+        
+        unsigned char randomBytes[32];
+        if (!CryptGenRandom(hProv, 32, randomBytes)) {
+            CryptReleaseContext(hProv, 0);
+            return "";
+        }
+        
+        CryptReleaseContext(hProv, 0);
+        
+        const char* hexChars = "0123456789abcdef";
+        std::string hexKey;
+        hexKey.reserve(64);
+        for (int i = 0; i < 32; i++) {
+            hexKey += hexChars[(randomBytes[i] >> 4) & 0xF];
+            hexKey += hexChars[randomBytes[i] & 0xF];
+        }
+        
+        return hexKey;
     }
 };
 

@@ -2,15 +2,6 @@
 
 Standalone RCON server for Windrose game servers using source rcon protocol. Injects via `version.dll` proxy and provides server information, query and player management.
 
-> [!WARNING]
-> This uses the **Source RCON protocol**, which transmits passwords and commands in **plain text** over TCP. Anyone able to sniff network traffic between your client and the server can read your RCON password and any commands you send.
->
-> **Recommendations:**
-> - Bind RCON to `127.0.0.1` (localhost) and use an SSH tunnel for remote access
-> - Run RCON only over a trusted network.
-> - Never expose the RCON port directly to the public internet.
-> - Use a strong, unique password
-
 ## Features
 
 - **Server Information** - View server details, player count, invite code
@@ -19,6 +10,11 @@ Standalone RCON server for Windrose game servers using source rcon protocol. Inj
 - **Logging** - All activity logged to `windrosercon/rcon.log`
 - **Player Management** - Manage players by their account IDs.
 - **Shutdown Command** - Shutdown server with optional delay.
+
+### Protocols
+
+- **Source RCON Protocol** - Standard Source RCON protocol for server management
+- **Secure RCON Protocol** - Encrypted RCON protocol for secure communication
 
 ## Installation
 
@@ -40,18 +36,31 @@ Edit `windrosercon/settings.ini`:
 
 ```ini
 [RCON]
+BindAddress=0.0.0.0
 Port=27065
 Password=windrose_admin
+AllowedIPs=
+MaxFailedAttempts=5
+Timeout=60
 EnableLogging=true
 LogFile=windrosercon\rcon.log
+
+[SecureRCON]
+Enabled=false
+AESKey=
 ```
 
 ## Usage
 
-Connect with any Source RCON client (e.g., `test_rcon.py`):
+1. Connect with any Source RCON client (e.g., `rcon_client.py`):
 
 ```bash
-python test_rcon.py
+python rcon_client.py
+```
+2. Connect to the server using Secure RCON client. (e.g., `rcon_secure.py`)
+
+```bash
+python rcon_secure.py
 ```
 
 ### Available Commands

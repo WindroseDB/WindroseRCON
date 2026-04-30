@@ -42,7 +42,7 @@ private:
 
     void ListenerLoop();
     void HandleClient(SOCKET clientSocket, std::string clientIP);
-    void SendPacket(SOCKET sock, int32_t id, RCONPacketType type, const std::string& body);
+    void SendPacket(SOCKET sock, int32_t id, RCONPacketType type, const std::string& body, bool encrypt = false);
     std::string ExecuteCommand(const std::string& command);
     bool IsIPAllowed(const std::string& ip);
     bool IsIPBlocked(const std::string& ip);

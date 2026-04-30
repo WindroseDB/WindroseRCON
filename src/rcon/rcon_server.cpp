@@ -1,5 +1,6 @@
 #include "rcon_server.h"
 #include "../config/config.h"
+#include "../crypto/aes_crypto.h"
 #include <fstream>
 #include <ctime>
 
@@ -52,6 +53,15 @@ bool RCONServer::Start(int port) {
         return false;
     }
 
+    if (g_Config.secureRconEnabled) {
+        if (!AESCrypto::Initialize(g_Config.aesKey)) {
+            LogMessage("RCON: Failed to initialize AES encryption - invalid key");
+            closesocket(listenSocket);
+            return false;
+        }
+        LogMessage("RCON: AES-256-GCM encryption enabled");
+    }
+    
     running = true;
     listenerThread = new std::thread(&RCONServer::ListenerLoop, this);
     
@@ -81,6 +91,10 @@ void RCONServer::Stop() {
         listenerThread->join();
         delete listenerThread;
         listenerThread = nullptr;
+    }
+    
+    if (g_Config.secureRconEnabled) {
+        AESCrypto::Cleanup();
     }
 
     LogMessage("RCON: Server stopped");
@@ -180,24 +194,46 @@ void RCONServer::HandleClient(SOCKET clientSocket, std::string clientIP) {
     
     while (running) {
         RCONPacket packet;
-        int received = recv(clientSocket, (char*)&packet, sizeof(int32_t), 0);
-        if (received <= 0) break;
+        
+        if (g_Config.secureRconEnabled) {
+            uint32_t encryptedSize = 0;
+            int received = recv(clientSocket, (char*)&encryptedSize, sizeof(uint32_t), 0);
+            if (received <= 0) break;
+            
+            if (encryptedSize > 8192) break;
+            
+            std::vector<uint8_t> encryptedData(encryptedSize);
+            received = recv(clientSocket, (char*)encryptedData.data(), encryptedSize, 0);
+            if (received <= 0) break;
+            
+            std::vector<uint8_t> decrypted = AESCrypto::Decrypt(encryptedData.data(), encryptedSize);
+            if (decrypted.empty() || decrypted.size() < sizeof(int32_t)) {
+                LogMessage("RCON: Failed to decrypt packet from " + clientIP);
+                break;
+            }
+            
+            size_t copySize = decrypted.size() < sizeof(RCONPacket) ? decrypted.size() : sizeof(RCONPacket);
+            memcpy(&packet, decrypted.data(), copySize);
+        } else {
+            int received = recv(clientSocket, (char*)&packet, sizeof(int32_t), 0);
+            if (received <= 0) break;
 
-        if (packet.size > sizeof(packet.body)) break;
+            if (packet.size > sizeof(packet.body)) break;
 
-        received = recv(clientSocket, (char*)&packet.id, packet.size, 0);
-        if (received <= 0) break;
+            received = recv(clientSocket, (char*)&packet.id, packet.size, 0);
+            if (received <= 0) break;
+        }
 
         if (packet.type == (int32_t)RCONPacketType::AUTH) {
             std::string password(packet.body);
             if (password == g_Config.password) {
                 authenticated = true;
                 ResetFailedAttempts(clientIP);
-                SendPacket(clientSocket, packet.id, RCONPacketType::AUTH_RESPONSE, "");
+                SendPacket(clientSocket, packet.id, RCONPacketType::AUTH_RESPONSE, "", g_Config.secureRconEnabled);
                 LogMessage("RCON: Client " + clientIP + " authenticated");
             } else {
                 RecordFailedAttempt(clientIP);
-                SendPacket(clientSocket, -1, RCONPacketType::AUTH_RESPONSE, "");
+                SendPacket(clientSocket, -1, RCONPacketType::AUTH_RESPONSE, "", g_Config.secureRconEnabled);
                 LogMessage("RCON: Authentication failed from " + clientIP);
                 break;
             }
@@ -210,7 +246,7 @@ void RCONServer::HandleClient(SOCKET clientSocket, std::string clientIP) {
             LogMessage("RCON: " + clientIP + " executing command: " + command);
             
             std::string response = ExecuteRCONCommand(command);
-            SendPacket(clientSocket, packet.id, RCONPacketType::RESPONSE_VALUE, response);
+            SendPacket(clientSocket, packet.id, RCONPacketType::RESPONSE_VALUE, response, g_Config.secureRconEnabled);
         }
     }
 
@@ -224,7 +260,7 @@ void RCONServer::HandleClient(SOCKET clientSocket, std::string clientIP) {
     LogMessage("RCON: Client " + clientIP + " disconnected");
 }
 
-void RCONServer::SendPacket(SOCKET sock, int32_t id, RCONPacketType type, const std::string& body) {
+void RCONServer::SendPacket(SOCKET sock, int32_t id, RCONPacketType type, const std::string& body, bool encrypt) {
     RCONPacket packet;
     packet.id = id;
     packet.type = (int32_t)type;
@@ -239,7 +275,17 @@ void RCONServer::SendPacket(SOCKET sock, int32_t id, RCONPacketType type, const 
     
     packet.size = sizeof(packet.id) + sizeof(packet.type) + (int32_t)bodyLen + 1;
     
-    send(sock, (char*)&packet, sizeof(packet.size) + packet.size, 0);
+    if (encrypt) {
+        size_t packetSize = sizeof(packet.size) + packet.size;
+        std::vector<uint8_t> encrypted = AESCrypto::Encrypt((uint8_t*)&packet, packetSize);
+        if (!encrypted.empty()) {
+            uint32_t encryptedSize = (uint32_t)encrypted.size();
+            send(sock, (char*)&encryptedSize, sizeof(uint32_t), 0);
+            send(sock, (char*)encrypted.data(), encryptedSize, 0);
+        }
+    } else {
+        send(sock, (char*)&packet, sizeof(packet.size) + packet.size, 0);
+    }
 }
 
 std::string RCONServer::ExecuteCommand(const std::string& command) {
