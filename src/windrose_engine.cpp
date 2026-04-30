@@ -135,8 +135,8 @@ namespace UnrealEngine {
         std::vector<PlayerInfo> players;
         
         // Get UWorld from GWorld offset
-        // Reference: SDK/Basic.hpp - Offsets::GWorld = 0x0F530460
-        uintptr_t gWorldAddr = moduleBase + 0x0F530460;
+        // Reference: SDK/Basic.hpp - Offsets::GWorld = 0x0F557460
+        uintptr_t gWorldAddr = moduleBase + 0x0F557460;
         UObject** gWorldPtr = (UObject**)gWorldAddr;
         
         if (!gWorldPtr || IsBadReadPtr(gWorldPtr, 8) || !*gWorldPtr) {
@@ -301,17 +301,20 @@ namespace UnrealEngine {
                     int32_t Max;
                 };
                 
+                // Reference: SDK/Basic.hpp - Offsets::AppendString = 0x014516E0
                 typedef void(*AppendStringFn)(void*, FString*);
-                AppendStringFn AppendString = (AppendStringFn)(moduleBase + 0x014513A0);
+                AppendStringFn AppendString = (AppendStringFn)(moduleBase + 0x014516E0);
                 
                 UObject* clientTravelFunc = nullptr;
                 
                 for (UObject* clss = pcClass; clss && !IsBadReadPtr(clss, 0x100); ) {
+                    // Reference: SDK/CoreUObject_classes.hpp - UStruct::ChildProperties = 0x0048
                     UObject** childrenPtr = (UObject**)((uintptr_t)clss + 0x0048);
                     if (childrenPtr && !IsBadReadPtr(childrenPtr, 8)) {
                         for (UObject* field = *childrenPtr; field && !IsBadReadPtr(field, 0x50); ) {
                             wchar_t nameBuf[256] = {0};
                             FString nameStr = {nameBuf, 0, 256};
+                            // Reference: SDK/CoreUObject_classes.hpp - UField::NamePrivate = 0x0018
                             void* fnamePtr = (void*)((uintptr_t)field + 0x0018);
                             
                             try {
@@ -323,6 +326,7 @@ namespace UnrealEngine {
                                 }
                             } catch (...) {}
                             
+                            // Reference: SDK/CoreUObject_classes.hpp - UField::Next = 0x0028
                             UObject** nextPtr = (UObject**)((uintptr_t)field + 0x0028);
                             if (!nextPtr || IsBadReadPtr(nextPtr, 8)) break;
                             field = *nextPtr;
@@ -330,6 +334,7 @@ namespace UnrealEngine {
                     }
                     if (clientTravelFunc) break;
                     
+                    // Reference: SDK/CoreUObject_classes.hpp - UStruct::SuperStruct = 0x0040
                     UObject** superPtr = (UObject**)((uintptr_t)clss + 0x0040);
                     if (!superPtr || IsBadReadPtr(superPtr, 8)) break;
                     clss = *superPtr;
@@ -340,8 +345,9 @@ namespace UnrealEngine {
                     return false;
                 }
                 
+                // Reference: SDK/Basic.hpp - Offsets::ProcessEvent = 0x0168EF60
                 typedef void(*ProcessEventFn)(UObject*, UObject*, void*);
-                ProcessEventFn ProcessEvent = (ProcessEventFn)(moduleBase + 0x0168EBC0);
+                ProcessEventFn ProcessEvent = (ProcessEventFn)(moduleBase + 0x0168EF60);
                 
                 struct {
                     FString URL;
