@@ -135,8 +135,8 @@ namespace UnrealEngine {
         std::vector<PlayerInfo> players;
         
         // Get UWorld from GWorld offset
-        // Reference: SDK/Basic.hpp - Offsets::GWorld = 0x0F557460
-        uintptr_t gWorldAddr = moduleBase + 0x0F557460;
+        // Reference: SDK/Basic.hpp - Offsets::GWorld = 0x0F607460
+        uintptr_t gWorldAddr = moduleBase + 0x0F607460;
         UObject** gWorldPtr = (UObject**)gWorldAddr;
         
         if (!gWorldPtr || IsBadReadPtr(gWorldPtr, 8) || !*gWorldPtr) {
@@ -301,15 +301,15 @@ namespace UnrealEngine {
                     int32_t Max;
                 };
                 
-                // Reference: SDK/Basic.hpp - Offsets::AppendString = 0x014516E0
+                // Reference: SDK/Basic.hpp - Offsets::AppendString = 0x01454600
                 typedef void(*AppendStringFn)(void*, FString*);
-                AppendStringFn AppendString = (AppendStringFn)(moduleBase + 0x014516E0);
+                AppendStringFn AppendString = (AppendStringFn)(moduleBase + 0x01454600);
                 
                 UObject* clientTravelFunc = nullptr;
                 
                 for (UObject* clss = pcClass; clss && !IsBadReadPtr(clss, 0x100); ) {
-                    // Reference: SDK/CoreUObject_classes.hpp - UStruct::ChildProperties = 0x0048
-                    UObject** childrenPtr = (UObject**)((uintptr_t)clss + 0x0048);
+                    // Reference: SDK/CoreUObject_classes.hpp - UStruct::ChildProperties = 0x0050
+                    UObject** childrenPtr = (UObject**)((uintptr_t)clss + 0x0050);
                     if (childrenPtr && !IsBadReadPtr(childrenPtr, 8)) {
                         for (UObject* field = *childrenPtr; field && !IsBadReadPtr(field, 0x50); ) {
                             wchar_t nameBuf[256] = {0};
@@ -345,9 +345,9 @@ namespace UnrealEngine {
                     return false;
                 }
                 
-                // Reference: SDK/Basic.hpp - Offsets::ProcessEvent = 0x0168EF60
+                // Reference: SDK/Basic.hpp - Offsets::ProcessEvent = 0x01691E20
                 typedef void(*ProcessEventFn)(UObject*, UObject*, void*);
-                ProcessEventFn ProcessEvent = (ProcessEventFn)(moduleBase + 0x0168EF60);
+                ProcessEventFn ProcessEvent = (ProcessEventFn)(moduleBase + 0x01691E20);
                 
                 struct {
                     FString URL;

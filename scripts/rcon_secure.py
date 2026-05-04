@@ -6,7 +6,7 @@ import os
 RCON_HOST = "127.0.0.1"
 RCON_PORT = 27065
 RCON_PASSWORD = "windrose_admin"
-AES_KEY = ""  # Put your AES key here from the settings.ini file
+AES_KEY = "" # Put your AES key here from the settings.ini file
 
 class SecureRCONClient:
     SERVERDATA_AUTH = 3
