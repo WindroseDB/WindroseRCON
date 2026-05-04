@@ -308,8 +308,8 @@ namespace UnrealEngine {
                 UObject* clientTravelFunc = nullptr;
                 
                 for (UObject* clss = pcClass; clss && !IsBadReadPtr(clss, 0x100); ) {
-                    // Reference: SDK/CoreUObject_classes.hpp - UStruct::ChildProperties = 0x0050
-                    UObject** childrenPtr = (UObject**)((uintptr_t)clss + 0x0050);
+                    // Reference: SDK/CoreUObject_classes.hpp - UStruct::Children = 0x0048
+                    UObject** childrenPtr = (UObject**)((uintptr_t)clss + 0x0048);
                     if (childrenPtr && !IsBadReadPtr(childrenPtr, 8)) {
                         for (UObject* field = *childrenPtr; field && !IsBadReadPtr(field, 0x50); ) {
                             wchar_t nameBuf[256] = {0};

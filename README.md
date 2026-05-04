@@ -13,8 +13,8 @@ Standalone RCON server for Windrose game servers using source rcon protocol. Inj
 
 ### Protocols
 
-- **Source RCON Protocol** - Standard Source RCON protocol for server management
-- **Secure RCON Protocol** - Encrypted RCON protocol for secure communication
+- **Source RCON Protocol** - Standard source RCON protocol that transfers data over plain text.
+- **Secure RCON Protocol** - Encrypted RCON protocol that uses AES encryption for data transfer.
 
 ## Installation
 
@@ -94,13 +94,10 @@ python rcon_secure.py
 
 ### How It Works
 
-1. **DLL Proxy Injection**: `version.dll` acts as a proxy for the system `version.dll`, forwarding all API calls while injecting our code
-2. **GObjects Scanning**: Scans Unreal Engine's global object array to find player states
-3. **Player Validation**: Validates players by checking offsets:
-   - `0x0340` - PlayerName (FString)
-   - `0x0388` - AccountId (FString)  
-   - `0x02B2` - PlayerFlags (filters inactives)
-4. **RCON Protocol**: Implements Source RCON protocol for authentication and commands.
+1. **DLL Proxy Injection**: The mod loads as `version.dll`, intercepting the game's DLL loading process to inject the RCON server.
+2. **Memory Access**: Uses SDK offsets to locate game structures like `GWorld`, `GameState`, and `PlayerArray` to read player information.
+3. **RCON Server**: Starts a TCP server that implements the Source RCON protocol for authentication and command processing.
+4. **Command Execution**: Executes commands by calling Unreal Engine functions through `ProcessEvent` to interact with the game.
 
 ## Contributing
 
