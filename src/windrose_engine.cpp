@@ -359,8 +359,8 @@ namespace UnrealEngine {
                 } params = {};
                 
                 // "Void" now corrupts the player's data...
-                // Using "/Game/Maps/Lobby/R5ClientLobby" instead
-                static wchar_t lobbyUrl[] = L"/Game/Maps/Lobby/R5ClientLobby";
+                // Using "/Game/Maps/Lobby/R5ClientLobby.R5ClientLobby_C" to send the player to the lobby
+                static wchar_t lobbyUrl[] = L"/Game/Maps/Lobby/R5ClientLobby.R5ClientLobby_C";
                 params.URL.Data = lobbyUrl;
                 params.URL.Count = (int32_t)(sizeof(lobbyUrl) / sizeof(wchar_t));
                 params.URL.Max = params.URL.Count;
