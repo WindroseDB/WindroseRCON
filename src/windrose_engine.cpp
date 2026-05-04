@@ -358,7 +358,9 @@ namespace UnrealEngine {
                     uint8_t Pad_24[4];
                 } params = {};
                 
-                static wchar_t lobbyUrl[] = L"Void";
+                // "Void" now corrupts the player's data...
+                // Using "/Game/Maps/Lobby/R5ClientLobby" instead
+                static wchar_t lobbyUrl[] = L"/Game/Maps/Lobby/R5ClientLobby";
                 params.URL.Data = lobbyUrl;
                 params.URL.Count = (int32_t)(sizeof(lobbyUrl) / sizeof(wchar_t));
                 params.URL.Max = params.URL.Count;
