@@ -1,5 +1,5 @@
 set_project("windrose-rcon")
-set_version("1.1.0")
+set_version("1.1.2")
 
 add_rules("mode.release")
 
